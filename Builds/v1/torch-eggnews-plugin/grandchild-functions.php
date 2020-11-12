@@ -31,7 +31,7 @@ function bt_safe_add_staff_role_field() {
       // loop trough each author
       foreach ($users as $user)
       {
-          // add points meta all the user's data
+          // set all user's roles to a default value of staff reporter
           add_user_meta( $user->id, 'staff_role', 'Staff Reporter', true );
       }
   }
@@ -53,6 +53,53 @@ function bt_grandchild_add_scripts() {
 }
 add_action( 'wp_print_scripts', 'grandchild_add_scripts' );
 
+/**
+ * Add new fields above 'Update' button.
+ *
+ * @param WP_User $user User object.
+ */
+function bt_staff_role_field( $user ) {
+
+    //All the drop down options
+    $roles 	= array( 'Supervisor',
+      'Co-Editor',
+      'Website Coordinator',
+      'News Editor',
+      'Opinion Editor',
+      'In-depth Editor',
+      'Feature Editor',
+      'Sports Editor',
+      'Backpage Editor',
+      'Graphics Editor',
+      'Assistant Graphics Editor',
+      'Graphics Staff',
+      'Staff Reporter' );
+
+    $default	= 'Staff Reporter';
+    $current_role = wp_parse_args( get_the_author_meta( 'staff_role', $user->ID ), $default );
+
+    ?>
+    <h3>Staff Role</h3>
+
+    <table class="form-table">
+   	 <tr>
+   		 <th><label for="staff_role">Birth date</label></th>
+   		 <td>
+   			 <select id="staff-role" name="staff_role[role]"><?php
+   				 foreach ( $roles as $role ) {
+   					 printf( '<option value="%1$s" %2$s>%1$s</option>', $role, selected( $staff_role['role'], $role, false ) );
+   				 }
+   			 ?></select>
+   		 </td>
+   	 </tr>
+    </table>
+    <?php
+}
+
+add_action( 'show_user_profile', 'tm_additional_profile_fields' );
+add_action( 'edit_user_profile', 'tm_additional_profile_fields' );
+
+// Shortcode for staff directory
 function er_staff_directory() {
 
   //Enqueues style sheet needed
@@ -91,10 +138,10 @@ function er_staff_directory() {
     // Creates widget for each user containing a id specified
     foreach ($staff_role_array as $staff_role) {
 
-      // Searches for users with specific id
+      // Searches for users with specific role
       $users = new WP_User_Query( array(
-          'search'         => '*'.esc_attr( $position_id ),
-          'search_columns' => array('user_login'),
+          'meta_key'         => 'staff_role',
+          'meta_value' => $staff_role
       ) );
       $users_found = $users->get_results();
       // Creates a widget for each user found in the search
