@@ -90,7 +90,12 @@ function bt_staff_role_field($user)
       'Staff Reporter' );
 
     $default	= 'Staff Reporter';
-    $current_role = wp_parse_args(get_the_author_meta('staff_role', $user->ID), $default); ?>
+    $current_role = get_the_author_meta('staff_role', $user->ID);
+    if( !$current_role ) {
+      $current_role = $default;
+    }
+    echo $current_role;
+    ?>
     <h3>Staff Role</h3>
 
     <table class="form-table">
@@ -99,7 +104,7 @@ function bt_staff_role_field($user)
    		 <td>
    			 <select id="staff-role" name="the_role"><?php
                  foreach ($roles as $role) {
-                     printf('<option value="%1$s" %2$s>%1$s</option>', $role, selected($current_role, $role, false));
+                     printf('<option value="%1$s" %2$s>%1$s</option>', $role, selected($current_role, $role), false);
                  } ?></select>
    		 </td>
    	 </tr>

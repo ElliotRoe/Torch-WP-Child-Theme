@@ -12,10 +12,6 @@ get_header(); ?>
 		<main id="main" class="site-main" role="main">
 
 			<?php
-                        $teg_cat_id = get_query_var('cat');
-                        if (have_posts()) :
-            ?>
-			<?php
       $curauth = (isset($_GET['author_name'])) ? get_user_by('slug', $author_name) : get_userdata(intval($author));
       ?>
 
@@ -56,13 +52,6 @@ get_header(); ?>
                     the_posts_pagination();
                     ?>
 				</div><!-- .archive-content-wrapper -->
-				<?php
-            else :
-
-                get_template_part( 'template-parts/content', 'none' );
-
-            endif;
-            ?>
 
 		</main><!-- #main -->
 	</div><!-- #primary -->
