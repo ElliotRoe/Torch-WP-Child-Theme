@@ -12,9 +12,9 @@ get_header(); ?>
 		<main id="main" class="site-main" role="main">
 
 			<?php
-						$teg_cat_id = get_query_var( 'cat' );
-						if ( have_posts() ) :
-			?>
+                        $teg_cat_id = get_query_var('cat');
+                        if (have_posts()) :
+            ?>
 			<?php
       $curauth = (isset($_GET['author_name'])) ? get_user_by('slug', $author_name) : get_userdata(intval($author));
       ?>
@@ -22,36 +22,47 @@ get_header(); ?>
 				<header class="page-header">
 					<h1 class="page-title"><?php echo $curauth->display_name; ?></h1>
 					<div class="bt-author-info-header">
-						<span class="bt-author-staff-role"><?php echo the_author_meta( 'staff_role', $curauth->ID )?></span>
+						<span class="bt-author-staff-role"><?php echo the_author_meta('staff_role', $curauth->ID)?></span>
 						<?php // TODO: Add view functionality?>
-						<span class="bt-author-views">Views: NA</span></div>
+						<img class="bt-author-views-icon" src="http://wordpress.grfx.tech/wp-content/uploads/2020/11/Eye.png" alt=""><span class="bt-author-views">000</span></div>
 				</header><!-- .page-header -->
 				<div class="bt-author-bio">
-				<?php echo $curauth->description ?>
+					<div class="bt-author-bio-img-wrapper">
+						<img src="<?php
+							if(isset($simple_local_avatars)) {
+								echo $simple_local_avatars->get_simple_local_avatar_url($curauth->ID, 200);
+							} else {
+								echo "https://bexleytorch.org/wp-content/uploads/2020/10/Torch-Logo.png";
+							}
+						?>" alt="Profile Pic">
+					</div>
+					<p class="bt-author-bio-text">
+						<?php echo $curauth->description ?>
+					</p>
 				</div>
 				<div class="archive-content-wrapper clearfix">
 					<?php
-					/* Start the Loop */
-					while ( have_posts() ) : the_post();
-						/*
-						* Include the Post-Format-specific template for the content.
-						* If you want to override this in a child theme, then include a file
-						* called content-___.php (where ___ is the Post Format name) and that will be used instead.
-						*/
-						get_template_part( WP_CONTENT_DIR . 'themes/eggnews/template-parts/content', get_post_format());
+                    /* Start the Loop */
+                    while (have_posts()) : the_post();
+                        /*
+                        * Include the Post-Format-specific template for the content.
+                        * If you want to override this in a child theme, then include a file
+                        * called content-___.php (where ___ is the Post Format name) and that will be used instead.
+                        */
+                        get_template_part( 'template-parts/content', get_post_format() );
 
-					endwhile;
+                    endwhile;
 
-					the_posts_pagination();
-					?>
+                    the_posts_pagination();
+                    ?>
 				</div><!-- .archive-content-wrapper -->
 				<?php
-			else :
+            else :
 
-				get_template_part( WP_CONTENT_DIR . 'themes/eggnews/template-parts/content', 'none' );
+                get_template_part( 'template-parts/content', 'none' );
 
-			endif;
-			?>
+            endif;
+            ?>
 
 		</main><!-- #main -->
 	</div><!-- #primary -->

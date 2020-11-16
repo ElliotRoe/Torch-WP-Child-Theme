@@ -199,7 +199,7 @@ function bt_staff_directory()
                 $content .= '<img src="' . $pic_url . '" alt="' . $first . ' ' . $last . 'Staff Picture' . '" class="er-staff-picture">';
                 $content .= '<span class="er-staff-text">';
                 $content .= '<h5 class="er-staff-name">' . $first . ' ' . $last . '</h5>';
-                $content .= '<p class="er-staff-position">'. $position .'</p>';
+                $content .= '<p class="er-staff-position">'. $staff_role .'</p>';
                 $content .= '</span>';
                 $content .= '</div>';
                 $content .= '</a>';
