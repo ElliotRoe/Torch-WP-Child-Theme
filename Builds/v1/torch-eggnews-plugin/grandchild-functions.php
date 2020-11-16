@@ -18,6 +18,7 @@ function bt_check_for_eggnews()
          </div>';
     }
 }
+// TODO: implement in v2
 //register_activation_hook(plugin_dir_path( __FILE__ ) . "grandchild-functions.php", 'bt_check_for_eggnews');
 
 // TODO: Test bt_safe_add_staff_role_field
@@ -140,7 +141,7 @@ function bt_staff_directory()
 {
 
   //Enqueues style sheet needed
-    wp_enqueue_style('er-staff-style', plugin_dir_url(__FILE__) . 'css/er-staff-style.css');
+    wp_enqueue_style('bt-staff-directory-style', plugin_dir_url(__FILE__) . 'bt-staff-directory-style.css');
 
     //Creates sections in the staff directory and directs where each staff roll goes
 
@@ -169,8 +170,8 @@ function bt_staff_directory()
 
     $content = '';
     foreach ($sections as $section_title => $staff_role_array) {
-        $content .= '<div class="block-header"><h3 class="er-section-title block-title">' . $section_title . '</h3></div>';
-        $content .= '<div class="er-section-wrapper">';
+        $content .= '<div class="block-header"><h3 class="bt-section-title block-title">' . $section_title . '</h3></div>';
+        $content .= '<div class="bt-section-wrapper">';
 
         // Creates widget for each user containing a id specified
         foreach ($staff_role_array as $staff_role) {
@@ -200,12 +201,12 @@ function bt_staff_directory()
                 }
 
                 // Building html
-                $content .= '<a class="er-staff-link" href="' . $user_url . '">';
-                $content .= '<div class="er-staff-widget" id="' . $safe_username . '">';
-                $content .= '<img src="' . $pic_url . '" alt="' . $first . ' ' . $last . 'Staff Picture' . '" class="er-staff-picture">';
-                $content .= '<span class="er-staff-text">';
-                $content .= '<h5 class="er-staff-name">' . $first . ' ' . $last . '</h5>';
-                $content .= '<p class="er-staff-position">'. $staff_role .'</p>';
+                $content .= '<a class="bt-staff-link" href="' . $user_url . '">';
+                $content .= '<div class="bt-staff-widget" id="' . $safe_username . '">';
+                $content .= '<img src="' . $pic_url . '" alt="' . $first . ' ' . $last . 'Staff Picture' . '" class="bt-staff-picture">';
+                $content .= '<span class="bt-staff-text">';
+                $content .= '<h5 class="bt-staff-name">' . $first . ' ' . $last . '</h5>';
+                $content .= '<p class="bt-staff-position">'. $staff_role .'</p>';
                 $content .= '</span>';
                 $content .= '</div>';
                 $content .= '</a>';
@@ -240,7 +241,8 @@ function bt_plugin_menu()
     add_submenu_page($menu_slug, $upload_page_title, $upload_menu_title, $capability, $menu_slug, $function);
 }
 
-add_action('admin_menu', 'bt_plugin_menu');
+// TODO: Implement bt_plugin_menu in v2
+//add_action('admin_menu', 'bt_plugin_menu');
 
 // TODO: Finish HTML content for admin page and figure out how to do settings
 // Actual HTML content of the admin page
@@ -259,6 +261,7 @@ function bt_upload_plugin_page() { ?>
 function bt_author_template_loader($template)
 {
     if (is_author()) {
+        wp_enqueue_style('bt-author-style', plugin_dir_url(__FILE__) . 'bt-author-style.css');
         $new_template = untrailingslashit(plugin_dir_path(__FILE__)) . '/templates/author.php';
         return $new_template;
     }

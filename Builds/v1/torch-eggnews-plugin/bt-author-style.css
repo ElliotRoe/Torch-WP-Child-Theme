@@ -1,0 +1,44 @@
+.bt-author-bio {
+  margin-bottom: 40px;
+}
+
+.bt-author-info-header {
+  float: right;
+  padding-top: 4px;
+  color: white;
+}
+
+.bt-author-staff-role {
+  font-weight: bold;
+  margin-right: 9px;
+  text-transform: uppercase;
+}
+
+.bt-author-views-icon {
+  height: 17px;
+  width: 17px;
+  margin-right: 3px;
+  margin-top: -3px;
+}
+
+.bt-author-views {
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.archive .page-header {
+  padding-right: 10px;
+}
+
+.bt-author-bio-img-wrapper img {
+  width: 200px;
+  height: 200px;
+  float: left;
+  margin-right: 15px;
+  margin-bottom: 15px;
+  border-left: 4px solid #2141d1;
+}
+
+.bt-author-bio-text {
+  text-align: justify;
+}
