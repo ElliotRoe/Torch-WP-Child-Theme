@@ -12,13 +12,13 @@ Version: 1.0
 function bt_check_for_eggnews()
 {
     $theme = wp_get_theme();
-    if (true) {
+    if (1==1) {
         echo '<div class="notice notice-warning is-dismissible">
              <p>The current theme is' . $theme . '</p>
          </div>';
     }
 }
-register_activation_hook(__FILE__, 'bt_check_for_eggnews');
+//register_activation_hook(plugin_dir_path( __FILE__ ) . "grandchild-functions.php", 'bt_check_for_eggnews');
 
 // TODO: Test bt_safe_add_staff_role_field
 function bt_safe_add_staff_role_field()
@@ -34,13 +34,15 @@ function bt_safe_add_staff_role_field()
 
       // loop trough each author
         foreach ($users as $user) {
-            // set all user's roles to a default value of staff reporter
-            add_user_meta($user->id, 'staff_role', 'Staff Reporter', true);
+            if (!get_user_meta($user->id, 'staff_role', true)) {
+                // set all user's roles to a default value of staff reporter if not set
+                update_user_meta($user->id, 'staff_role', 'Staff Reporter', true);
+            }
         }
     }
 }
 
-register_activation_hook(__FILE__, 'bt_add_staff_role_field');
+register_activation_hook(plugin_dir_path(__FILE__) . "grandchild-functions.php", 'bt_safe_add_staff_role_field');
 
 // Adds our new file with styles
 function bt_grandchild_add_styles()
@@ -91,11 +93,10 @@ function bt_staff_role_field($user)
 
     $default	= 'Staff Reporter';
     $current_role = get_the_author_meta('staff_role', $user->ID);
-    if( !$current_role ) {
-      $current_role = $default;
+    if (!$current_role) {
+        $current_role = $default;
     }
-    echo $current_role;
-    ?>
+    echo $current_role; ?>
     <h3>Staff Role</h3>
 
     <table class="form-table">
@@ -239,7 +240,7 @@ function bt_plugin_menu()
     add_submenu_page($menu_slug, $upload_page_title, $upload_menu_title, $capability, $menu_slug, $function);
 }
 
-add_action( 'admin_menu', 'bt_plugin_menu' );
+add_action('admin_menu', 'bt_plugin_menu');
 
 // TODO: Finish HTML content for admin page and figure out how to do settings
 // Actual HTML content of the admin page
@@ -255,16 +256,16 @@ function bt_upload_plugin_page() { ?>
 }
 
 // TODO: Test bt_author_template_loader
-function bt_author_template_loader( $template ) {
-
-  if ( is_author() ) {
-        $new_template = untrailingslashit( plugin_dir_path( __FILE__ ) ) . '/templates/author.php';
+function bt_author_template_loader($template)
+{
+    if (is_author()) {
+        $new_template = untrailingslashit(plugin_dir_path(__FILE__)) . '/templates/author.php';
         return $new_template;
     }
     return $template;
 }
 
-add_filter( 'template_include', 'bt_author_template_loader' );
+add_filter('template_include', 'bt_author_template_loader');
 
 
   ?>

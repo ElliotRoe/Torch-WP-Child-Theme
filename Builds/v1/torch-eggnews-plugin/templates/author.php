@@ -25,11 +25,15 @@ get_header(); ?>
 				<div class="bt-author-bio">
 					<div class="bt-author-bio-img-wrapper">
 						<img src="<?php
+							$default_profile_url = "https://bexleytorch.org/wp-content/uploads/2020/10/Torch-Logo.png";
 							if(isset($simple_local_avatars)) {
-								echo $simple_local_avatars->get_simple_local_avatar_url($curauth->ID, 200);
-							} else {
-								echo "https://bexleytorch.org/wp-content/uploads/2020/10/Torch-Logo.png";
+								$profile_url = $simple_local_avatars->get_simple_local_avatar_url($curauth->ID, 200);
+								if(!$profile_url) {
+									$profile_url = $default_profile_url;
+								}
 							}
+
+							echo $profile_url;
 						?>" alt="Profile Pic">
 					</div>
 					<p class="bt-author-bio-text">
