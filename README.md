@@ -1,4 +1,4 @@
-# The Torch Grandchild theme plugin
+# The Torch Grandchild theme plugin [*v1*]
 
 The Torch Grandchild theme plugin for the Eggnews magazine theme containing all the extra functionality needed and helpful to run the Torch website.
 
