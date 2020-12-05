@@ -238,11 +238,18 @@ add_action('admin_menu', 'bt_plugin_menu');
 // Actual HTML content of the admin page
 function bt_plugin_page() { ?>
   <h1>Bexley Torch Plugin Settings</h1>
-  <form action="bt_upload.php" method="post" enctype="multipart/form-data">
+  <form class="bt-form" id="bt-upload-form" enctype="multipart/form-data">
   Select story zip file to upload:
     <input type="file" name="fileToUpload" id="fileToUpload">
     <input type="submit" value="Upload Zip" name="submit">
   </form>
+  <div id="error_message" style="width:100%; height:100%; display:none; ">
+    <h4>
+        Error
+    </h4>
+    Sorry there was an error sending your form.
+  </div>
+  <div id="success_message" style="width:100%; height:100%; display:none; "> <h2>Success! The stories were successfully uploaded!</h2> </div>
   <?php
 
 

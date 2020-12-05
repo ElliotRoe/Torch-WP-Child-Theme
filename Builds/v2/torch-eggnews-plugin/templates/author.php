@@ -43,12 +43,12 @@ get_header(); ?>
 					<p class="bt-author-bio-text">
 						<?php
 						if ($curauth->description) {
-							echo $curauth->description
+							echo $curauth->description;
 						} else {
 							if ($author_staff_role=='Staff Reporter') {
 								echo $curauth->display_name " is a junior at Bexley High School and a staff reporter on <i>The Torch</i>.";
 							} else {
-								echo $curauth->display_name ' is a senior at Bexley High School and a <span id="staff_role_insert">' . $author_staff_role . '</span> on <i>The Torch</i>.';
+								echo $curauth->display_name ' is a senior at Bexley High School and a <span id="staff-role-insert">' . $author_staff_role . '</span> on <i>The Torch</i>.';
 							}
 						}
 						?>
