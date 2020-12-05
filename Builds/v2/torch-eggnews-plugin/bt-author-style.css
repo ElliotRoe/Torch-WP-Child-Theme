@@ -42,3 +42,7 @@
 .bt-author-bio-text {
   text-align: justify;
 }
+
+#staff_role_insert{
+  text-transform: lowercase;
+}

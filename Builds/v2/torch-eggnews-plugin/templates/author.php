@@ -18,9 +18,13 @@ get_header(); ?>
 				<header class="page-header">
 					<h1 class="page-title"><?php echo $curauth->display_name; ?></h1>
 					<div class="bt-author-info-header">
-						<span class="bt-author-staff-role"><?php echo the_author_meta('staff_role', $curauth->ID)?></span>
-						<?php // TODO: Add view functionality?>
-						<img class="bt-author-views-icon" src="http://wordpress.grfx.tech/wp-content/uploads/2020/11/Eye.png" alt=""><span class="bt-author-views">000</span></div>
+						<span class="bt-author-staff-role">
+							<?php
+								$author_staff_role = the_author_meta('staff_role', $curauth->ID);
+								echo $author_staff_role;
+							?>
+						</span>
+					</div>
 				</header><!-- .page-header -->
 				<div class="bt-author-bio">
 					<div class="bt-author-bio-img-wrapper">
@@ -37,7 +41,17 @@ get_header(); ?>
 						?>" alt="Profile Pic">
 					</div>
 					<p class="bt-author-bio-text">
-						<?php echo $curauth->description ?>
+						<?php
+						if ($curauth->description) {
+							echo $curauth->description
+						} else {
+							if ($author_staff_role=='Staff Reporter') {
+								echo $curauth->display_name " is a junior at Bexley High School and a staff reporter on <i>The Torch</i>.";
+							} else {
+								echo $curauth->display_name ' is a senior at Bexley High School and a <span id="staff_role_insert">' . $author_staff_role . '</span> on <i>The Torch</i>.';
+							}
+						}
+						?>
 					</p>
 				</div>
 				<div class="archive-content-wrapper clearfix">
