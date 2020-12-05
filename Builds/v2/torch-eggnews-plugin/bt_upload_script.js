@@ -1,16 +1,38 @@
 $(function() {
+  var plugin_dir=jsVars.pluginUrl+"/";
   function after_form_submitted(data) {
-    if (data.result == 'success') {
+    if (data.fatalError != '') {
+      $('#success_message').hide();
+      $('#error_message').append('<span></span>');
+      $('#error_message span').text(data.fatalError);
+    } else {
+      $('#posted_message').append('<ul></ul>');
+
+      jQuery.each(data.postedStories, function(key, headline) {
+        $('#posted_message ul').append('<li>' + val + '</li>');
+      });
+      jQuery.each(data.postedWarningStories, function(headline, warningArray) {
+        var warnText = '<li>' + headline + '<ul>';
+
+        jQuery.each(warningArray, function(key, warning) {
+          warnText += '<li>' + warning + '</li>';
+        });
+        warnText +='</ul></li>';
+        $('#posted_message ul').append(warnText);
+      });
+
+      jQuery.each(data.failedStories, function(headline, failArray) {
+        var failText = '<li>' + headline + '<ul>';
+
+        jQuery.each(failArray, function(key, fail) {
+          warnText += '<li>' + fail + '</li>';
+        });
+        warnText +='</ul></li>';
+        $('#posted_message ul').append(failText);
+      });
+
       $('#success_message').show();
       $('#error_message').hide();
-    } else {
-      $('#error_message').append('<ul></ul>');
-
-      jQuery.each(data.errors, function(key, val) {
-        $('#error_message ul').append('<li>' + key + ':' + val + '</li>');
-      });
-      $('#success_message').hide();
-      $('#error_message').show();
 
       //reverse the response on the button
       $('button[type="button"]', $form).each(function() {
@@ -42,7 +64,7 @@ $(function() {
     var formdata = new FormData(this);
     $.ajax({
       type: "POST",
-      url: 'bt_upload_handler.php',
+      url: plugin_dir + 'bt_upload_handler.php',
       data: formdata,
       success: after_form_submitted,
       dataType: 'json',

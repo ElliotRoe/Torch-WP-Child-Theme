@@ -1,5 +1,5 @@
 <?php
-$success_array = array('Fatal Error' => '', 'Posted Stories' => array(), 'Failed Stories' => array());
+$success_array = array('fatalError' => '', 'postedStories' => array(), 'postedWarningStories' => array(), 'failedStories' => array());
 
 $target_dir = wp_upload_dir()['basedir'] . "stories";
 $target_file = $target_dir . "/" . basename($_FILES["fileToUpload"]["name"]);
@@ -34,7 +34,7 @@ if (!file_exists($target_file)) {
                                 $cat_slug = str_replace(' ', '-', trim(strtolower($category)));
                                 $cat_ID = get_category_by_slug($cat_slug);
                                 if ($cat_ID==0) {
-                                    $success_array['Posted Stories'][$headline][] = $category + " category could not be found with slug: ". $cat_slug .". Posted under uncategorized";
+                                    $success_array['postedWarningStories'][$headline][] = $category + " category could not be found with slug: ". $cat_slug .". Posted under uncategorized";
                                     $cat_ID = 1;
                                 }
                                 // Gets authors last name in order to use it as a key word in a user query search
@@ -45,7 +45,7 @@ if (!file_exists($target_file)) {
                                 if (!empty($user_query->get_results())) {
                                     $auth_ID = $user_query->get_results()[0]->ID;
                                 } else {
-                                    $success_array['Posted Stories'][$headline][] = "No author found. Searched with keyword: " . $keyword . ". Will post under defualt staff reporter (Bexley.StaffReporter)";
+                                    $success_array['postedWarningStories'][$headline][] = "No author found. Searched with keyword: " . $keyword . ". Will post under defualt staff reporter (Bexley.StaffReporter)";
                                     $auth_ID = get_user_by('login', 'Bexley.StaffReporter')->ID;
                                 }
 
@@ -58,27 +58,31 @@ if (!file_exists($target_file)) {
                                 );
 
                                 if (wp_insert_post($post_arr)==0) {
-                                    $success_array['Failed Stories'][$headline] = $success_array['Posted Stories'][$headline];
-                                    unset($success_array['Posted Stories'][$headline]);
-                                    $success_array['Failed Stories'][$headline][] = "Failed to post the story: " . $headline . ". wp_insert_post failed.";
+                                    $success_array['failedStories'][$headline] = $success_array['postedWarningStories'][$headline];
+                                    unset($success_array['postedWarningStories'][$headline]);
+                                    $success_array['failedStories'][$headline][] = "Failed to post the story: " . $headline . ". wp_insert_post failed.";
+                                } else {
+                                  if (!isset($success_array['postedWarningStories'][$headline])) {
+                                    $success_array['postedStories'][] = $headline;
+                                  }
                                 }
                             }
                         } else {
-                            $success_array['Failed Stories'][$headline] = array("Not .docx file");
+                            $success_array['failedStories'][$headline] = array("Not .docx file");
                         }
                     }
                 }
             } else {
-                $success_array['Fatal Error'] = "Could not extract file";
+                $success_array['fatalError'] = "Could not extract file";
             }
         } else {
-            $success_array['Fatal Error'] = "Could not move temp file to target file";
+            $success_array['fatalError'] = "Could not move temp file to target file";
         }
     } else {
-        $success_array['Fatal Error'] = "Only zip files are allowed.";
+        $success_array['fatalError'] = "Only zip files are allowed.";
     }
 } else {
-    $success_array['Fatal Error'] = "File already exists";
+    $success_array['fatalError'] = "File already exists";
 }
 
 echo $success_array;

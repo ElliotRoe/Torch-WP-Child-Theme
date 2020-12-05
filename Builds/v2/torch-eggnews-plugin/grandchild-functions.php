@@ -236,7 +236,11 @@ add_action('admin_menu', 'bt_plugin_menu');
 
 // TODO: Test bt_plugin_page
 // Actual HTML content of the admin page
-function bt_plugin_page() { ?>
+function bt_plugin_page() {
+  wp_enqueue_script( 'upload-script', plugin_dir_path(__FILE__) . 'bt_upload_script.js', array('jquery'));
+  $translation_array = array( 'pluginUrl' =>plugin_dir_path(__FILE__) );
+  wp_localize_script( 'upload-script', 'jsVars', $translation_array );
+  ?>
   <h1>Bexley Torch Plugin Settings</h1>
   <form class="bt-form" id="bt-upload-form" enctype="multipart/form-data">
   Select story zip file to upload:
@@ -245,11 +249,15 @@ function bt_plugin_page() { ?>
   </form>
   <div id="error_message" style="width:100%; height:100%; display:none; ">
     <h4>
-        Error
+        <b>Fatal Error</b> No stories were posted
     </h4>
-    Sorry there was an error sending your form.
   </div>
-  <div id="success_message" style="width:100%; height:100%; display:none; "> <h2>Success! The stories were successfully uploaded!</h2> </div>
+  <div id="success_message" style="width:100%; height:100%; display:none; ">
+    <h2>Success!</h2>
+    <h4 class="message_info_header" id="posted_message">The following stories were posted</h4>
+    <h4 class="message_info_header" id="posted_warn_message">The following stories were posted with <b>warnings</b></h4>
+    <h4 class="message_info_header" id="posted_fatal_message">The following stories were not posted due to a fatal error with them</h4>
+  </div>
   <?php
 
 
