@@ -1,10 +1,15 @@
-$(function() {
-  var plugin_dir=jsVars.pluginUrl+"/";
+jQuery(document).ready(function($) {
+
+  function ajax_error(data) {
+    console.log(data);
+  }
+
   function after_form_submitted(data) {
     if (data.fatalError != '') {
       $('#success_message').hide();
-      $('#error_message').append('<span></span>');
-      $('#error_message span').text(data.fatalError);
+      $('#error_message').append('<span id="specific_err"></span>');
+      $('#specific_err').text(data.fatalError);
+      $('#error_message').show();
     } else {
       $('#posted_message').append('<ul></ul>');
 
@@ -25,9 +30,9 @@ $(function() {
         var failText = '<li>' + headline + '<ul>';
 
         jQuery.each(failArray, function(key, fail) {
-          warnText += '<li>' + fail + '</li>';
+          failText += '<li>' + fail + '</li>';
         });
-        warnText +='</ul></li>';
+        failText +='</ul></li>';
         $('#posted_message ul').append(failText);
       });
 
@@ -61,17 +66,34 @@ $(function() {
     });
 
 
-    var formdata = new FormData(this);
-    $.ajax({
+    var formData = new FormData(this);
+
+    const workPlease = [...formData.entries()];
+
+    console.log(workPlease);
+    console.log(formData.has('tmp_name'));
+
+/*
+    jQuery.post(ajax_object.ajax_url, data, function(response) {
+    		alert('Got this from the server: ' + response);
+    	});
+*/
+
+    jQuery.ajax({
       type: "POST",
-      url: plugin_dir + 'bt_upload_handler.php',
-      data: formdata,
+      url: ajax_object.ajax_url,
+      data: {
+        formData: formData,
+        action: 'bt_upload_handler'
+      },
       success: after_form_submitted,
+      error: ajax_error,
       dataType: 'json',
       processData: false,
       contentType: false,
       cache: false
     });
+
 
   });
 });

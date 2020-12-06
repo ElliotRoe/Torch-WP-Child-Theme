@@ -13,14 +13,14 @@ get_header(); ?>
 
 			<?php
       $curauth = (isset($_GET['author_name'])) ? get_user_by('slug', $author_name) : get_userdata(intval($author));
-      ?>
+			$author_staff_role = get_the_author_meta('staff_role', $curauth->ID);
+			?>
 
 				<header class="page-header">
 					<h1 class="page-title"><?php echo $curauth->display_name; ?></h1>
 					<div class="bt-author-info-header">
 						<span class="bt-author-staff-role">
 							<?php
-								$author_staff_role = the_author_meta('staff_role', $curauth->ID);
 								echo $author_staff_role;
 							?>
 						</span>
@@ -46,9 +46,9 @@ get_header(); ?>
 							echo $curauth->description;
 						} else {
 							if ($author_staff_role=='Staff Reporter') {
-								echo $curauth->display_name " is a junior at Bexley High School and a staff reporter on <i>The Torch</i>.";
+								echo $curauth->display_name . " is a junior at Bexley High School and a staff reporter on <i>The Torch</i>.";
 							} else {
-								echo $curauth->display_name ' is a senior at Bexley High School and a <span id="staff-role-insert">' . $author_staff_role . '</span> on <i>The Torch</i>.';
+								echo $curauth->display_name . ' is a senior at Bexley High School and a <span id="staff-role-insert">' . $author_staff_role . '</span> on <i>The Torch</i>.';
 							}
 						}
 						?>
