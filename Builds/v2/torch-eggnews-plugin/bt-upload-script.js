@@ -11,52 +11,46 @@ jQuery(document).ready(function($) {
       $('#specific_err').text(data.fatalError);
       $('#error_message').show();
     } else {
-      $('#posted_message').append('<ul></ul>');
-
-      jQuery.each(data.postedStories, function(key, headline) {
-        $('#posted_message ul').append('<li>' + val + '</li>');
+      //Successfully posted stories
+      $('#posted_message').after('<ul id="success_list"></ul>');
+      jQuery.each(data.postedStories, function(headline, linkArray) {
+        $('#success_list').append('<li class="bt-story bt-story-success"><h4><a href="' + linkArray.link + '" target="_blank" rel="noopener noreferrer">' + headline + '</a></h4></li>');
       });
+      //Stories posted with warnings
+      $('#posted_warn_message').after('<ul id="warning_list"></ul>');
       jQuery.each(data.postedWarningStories, function(headline, warningArray) {
-        var warnText = '<li>' + headline + '<ul>';
+        console.log(headline);
+        var warnText = '<li class="bt-story bt-story-warning"><h4><a href="' + warningArray.link + '" target="_blank" rel="noopener noreferrer">' + headline + '</a></h4><ul>';
 
         jQuery.each(warningArray, function(key, warning) {
-          warnText += '<li>' + warning + '</li>';
+          if (key != 'link') {
+            warnText += '<li>' + warning + '</li>';
+          }
         });
         warnText += '</ul></li>';
-        $('#posted_message ul').append(warnText);
+        $('#warning_list').append(warnText);
       });
-
+      //Stories not posted due to fatal errors
+      $('#posted_fatal_message').after('<ul id="fail_list"></ul>');
       jQuery.each(data.failedStories, function(headline, failArray) {
-        var failText = '<li>' + headline + '<ul>';
+        var failText = '<li class="bt-story bt-story-failed"><h4>' + headline + '</h4><ul>';
 
         jQuery.each(failArray, function(key, fail) {
           failText += '<li>' + fail + '</li>';
         });
         failText += '</ul></li>';
-        $('#posted_message ul').append(failText);
+        $('#fail_list').append(failText);
       });
+
 
       $('#success_message').show();
       $('#error_message').hide();
 
-      //reverse the response on the button
-      $('button[type="button"]', $form).each(function() {
-        $btn = $(this);
-        label = $btn.prop('orig_label');
-        if (label) {
-          $btn.prop('type', 'submit');
-          $btn.text(label);
-          $btn.prop('orig_label', '');
-        }
-      });
-
-    } //else
+    }
   }
 
   $('#bt-upload-form').submit(function(e) {
     e.preventDefault();
-
-    console.log("Submtted");
 
     $form = $(this);
     //show some response on the button
@@ -82,6 +76,7 @@ jQuery(document).ready(function($) {
       cache: false
     }).done(function(response) {
       after_form_submitted(response);
+      console.log(response);
     }).fail(function(response) {
       api_error(response);
     }).always(function() {
