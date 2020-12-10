@@ -1,5 +1,6 @@
 .bt-author-bio {
   margin-bottom: 40px;
+  height: 200px;
 }
 
 .bt-author-info-header {
@@ -41,8 +42,13 @@
 
 .bt-author-bio-text {
   text-align: justify;
+  -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  height: 100%;
+  padding: 12px;
 }
 
-#staff-role-insert{
+#staff-role-insert {
   text-transform: lowercase;
 }

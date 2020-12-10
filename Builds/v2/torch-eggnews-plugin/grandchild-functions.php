@@ -182,32 +182,34 @@ function bt_staff_directory()
             $users_found = $users->get_results();
             // Creates a widget for each user found in the search
             foreach ($users_found as $user) {
-                // Gets suer id for meta searches
+                // Gets user id for meta searches
                 $id = $user->ID;
-                // Bunch of meta searches for the info needed
-                $user_url = get_author_posts_url($id);
-                $safe_username = str_replace('.', '', get_user_meta($id, 'username', true));
                 $first = get_user_meta($id, 'first_name', true);
-                $last = get_user_meta($id, 'last_name', true);
+                if ($first != 'Bexley') {
+                    $last = get_user_meta($id, 'last_name', true);
+                    // Bunch of meta searches for the info needed
+                    $user_url = get_author_posts_url($id);
+                    $safe_username = str_replace('.', '', get_user_meta($id, 'username', true));
 
-                // Makes sure that the function exists before calling it
-                if ($local_set) {
-                    $pic_url = $simple_local_avatars->get_simple_local_avatar_url($id, 100);
-                    if (empty($pic_url)) {
-                        $pic_url = $defualt_url;
+                    // Makes sure that the function exists before calling it
+                    if ($local_set) {
+                        $pic_url = $simple_local_avatars->get_simple_local_avatar_url($id, 100);
+                        if (empty($pic_url)) {
+                            $pic_url = $defualt_url;
+                        }
                     }
-                }
 
-                // Building html
-                $content .= '<a class="bt-staff-link" href="' . $user_url . '">';
-                $content .= '<div class="bt-staff-widget" id="' . $safe_username . '">';
-                $content .= '<img src="' . $pic_url . '" alt="' . $first . ' ' . $last . 'Staff Picture' . '" class="bt-staff-picture">';
-                $content .= '<span class="bt-staff-text">';
-                $content .= '<h5 class="bt-staff-name">' . $first . ' ' . $last . '</h5>';
-                $content .= '<p class="bt-staff-position">'. $staff_role .'</p>';
-                $content .= '</span>';
-                $content .= '</div>';
-                $content .= '</a>';
+                    // Building html
+                    $content .= '<a class="bt-staff-link" href="' . $user_url . '">';
+                    $content .= '<div class="bt-staff-widget" id="' . $safe_username . '">';
+                    $content .= '<img src="' . $pic_url . '" alt="' . $first . ' ' . $last . 'Staff Picture' . '" class="bt-staff-picture">';
+                    $content .= '<span class="bt-staff-text">';
+                    $content .= '<h5 class="bt-staff-name">' . $first . ' ' . $last . '</h5>';
+                    $content .= '<p class="bt-staff-position">'. $staff_role .'</p>';
+                    $content .= '</span>';
+                    $content .= '</div>';
+                    $content .= '</a>';
+                }
             }
         }
         $content .= '</div>';
@@ -232,7 +234,7 @@ function bt_plugin_menu()
     add_menu_page($page_title, $menu_title, $capability, $menu_slug, $function, $icon_url, $position);
 }
 
-add_action('admin_menu', 'bt_plugin_menu');
+//add_action('admin_menu', 'bt_plugin_menu');
 
 // TODO: Test bt_plugin_page
 // Actual HTML content of the admin page
@@ -340,11 +342,12 @@ function bt_upload_handler()
                                     $filtered_content = str_ireplace("\x0D", "", $filtered_content);
                                     error_log("Filtered Content: " . $filtered_content);
                                     $cat_slug = str_replace(' ', '-', trim(strtolower($category)));
-                                    $cat_ID = get_category_by_slug($cat_slug)->term_id;
-                                    error_log("cat_ID: " . $cat_ID);
-                                    if ($cat_ID==0) {
+                                    $cat_obj = get_category_by_slug($cat_slug);
+                                    $cat_ID = 1;
+                                    if ($cat_obj===false) {
                                         $success_array['postedWarningStories'][$headline][] = $category . " category could not be found with slug: ". $cat_slug .". Posted under uncategorized";
-                                        $cat_ID = 1;
+                                    } else {
+                                        $cat_ID = $cat_obj->term_id;
                                     }
                                     // Gets authors last name in order to use it as a key word in a user query search
                                     $author_keyword = substr($author, strlen($author)-strpos(strrev($author), " "));
