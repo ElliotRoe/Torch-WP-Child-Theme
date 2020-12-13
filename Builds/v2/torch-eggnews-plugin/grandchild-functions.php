@@ -4,7 +4,7 @@ Plugin Name: Bexley Torch - Grandchild theme plugin
 Description: Grandchild theme for the Eggnews magazine child theme. Meant to add custom funcitonality for the torch
 Author: Elliot Roe
 Author URI: https://bexleytorch.org
-Version: 2.0
+Version: 2.1
 */
 
 // TODO: Check theme slug and update function
@@ -234,7 +234,7 @@ function bt_plugin_menu()
     add_menu_page($page_title, $menu_title, $capability, $menu_slug, $function, $icon_url, $position);
 }
 
-//add_action('admin_menu', 'bt_plugin_menu');
+add_action('admin_menu', 'bt_plugin_menu');
 
 // TODO: Test bt_plugin_page
 // Actual HTML content of the admin page
@@ -253,8 +253,7 @@ function bt_plugin_page()
         <span>Fatal Error!!</span> No stories were posted
     </h4>
   </div>
-  <div id="success_message" style="width:100%; height:100%; display:none; ">
-    <h2>Success!</h2>
+  <div id="success_message" style="width:100%; height:100%; display:none;  ">
     <h2 class="message_info_header" id="posted_message">The following stories were posted</h2>
     <h2 class="message_info_header" id="posted_warn_message">The following stories were posted with <b>warnings</b></h2>
     <h2 class="message_info_header" id="posted_fatal_message">The following stories were not posted due to a fatal error with them</h2>
@@ -319,10 +318,11 @@ function bt_upload_handler()
                     $first_folder = scandir($unzip_dir)[2];
                     $story_dir = $unzip_dir . $first_folder . '/';
                     $dir = new DirectoryIterator($story_dir);
+                    $file_index = 0;
                     foreach ($dir as $fileinfo) {
                         if (!$fileinfo->isDot()) {
+                            $success_array['postedWarningStories'][$file_index]['filename'] = $fileinfo->getFilename();
                             if (strpos($fileinfo->getFilename(), ".docx")) {
-                                error_log("File name: " . $fileinfo->getFilename());
                                 $docxObj = new DocxConversion($story_dir . $fileinfo->getFilename());
                                 $unfiltered_content = $docxObj->convertToText();
                                 if ($unfiltered_content) {
@@ -330,7 +330,12 @@ function bt_upload_handler()
                                     $category = str_ireplace("\x0D", "", strtok($unfiltered_content, $separator));
                                     error_log("Category: " . $category);
                                     $headline = trim(strtok($separator));
-                                    error_log("Headline: " . $headline);
+                                    if (!$headline) {
+                                        $success_array['postedWarningStories'][$file_index]['warnings'][] = 'Headline is empty. Posting under the headline "No title".';
+                                        $headline = 'No title';
+                                    } else {
+                                        $success_array['postedWarningStories'][$file_index]['headline'] = $headline;
+                                    }
                                     $author = trim(strtok($separator));
                                     error_log("Author: " . $author);
 
@@ -345,7 +350,7 @@ function bt_upload_handler()
                                     $cat_obj = get_category_by_slug($cat_slug);
                                     $cat_ID = 1;
                                     if ($cat_obj===false) {
-                                        $success_array['postedWarningStories'][$headline][] = $category . " category could not be found with slug: ". $cat_slug .". Posted under uncategorized";
+                                        $success_array['postedWarningStories'][$file_index]['warnings'][] = $category . " category could not be found with slug: ". $cat_slug .". Posted under uncategorized";
                                     } else {
                                         $cat_ID = $cat_obj->term_id;
                                     }
@@ -362,7 +367,7 @@ function bt_upload_handler()
                                         $user = $user_query->get_results()[0];
                                         $auth_ID = $user->ID;
                                     } else {
-                                        $success_array['postedWarningStories'][$headline][] = "No author found. Searched with keyword: " . $author_keyword . ". Will post under defualt staff reporter (Bexley.StaffReporter)";
+                                        $success_array['postedWarningStories'][$file_index]['warnings'][] = "No author found. Searched with keyword: " . $author_keyword . ". Posted under defualt staff reporter (Bexley.StaffReporter)";
                                         $auth_ID = get_user_by('login', 'Bexley.StaffReporter')->ID;
                                         error_log("auth_ID: " . $auth_ID);
                                     }
@@ -392,31 +397,30 @@ function bt_upload_handler()
                                     if ($post_if < 1) {
                                         $post_ID = wp_insert_post($post_arr);
                                         if ($post_ID==0) {
-                                            $success_array['failedStories'][$headline] = $success_array['postedWarningStories'][$headline];
-                                            unset($success_array['postedWarningStories'][$headline]);
-                                            $success_array['failedStories'][$headline][] = "Failed to post the story: " . $headline . ". wp_insert_post failed.";
+                                            $success_array['failedStories'][$file_index] = $success_array['postedWarningStories'][$file_index];
+                                            unset($success_array['postedWarningStories'][$file_index]);
+                                            $success_array['failedStories'][$file_index]['fails'] = "Failed to post the story: " . $headline . ". wp_insert_post failed.";
                                         } else {
                                             $edit_link = get_edit_post_link($post_ID);
-                                            if (!isset($success_array['postedWarningStories'][$headline])) {
-                                                $success_array['postedStories'][$headline] = array('link'=>$edit_link);
+                                            if (!isset($success_array['postedWarningStories'][$file_index]['warnings'])) {
+                                                $success_array['postedStories'][$file_index] = $success_array['postedWarningStories'][$file_index];
+                                                $success_array['postedStories'][$file_index]['link'] = $edit_link;
                                             } else {
-                                                $success_array['postedWarningStories'][$headline]['link'] = $edit_link;
+                                                $success_array['postedWarningStories'][$file_index]['link'] = $edit_link;
                                             }
                                         }
                                     } else {
-                                        $success_array['failedStories'][$headline][] = "Duplicate post";
-                                        if (isset($success_array['postedWarningStories'][$headline])) {
-                                            unset($success_array['postedWarningStories'][$headline]);
-                                        }
+                                        $success_array['failedStories'][$file_index] = $success_array['postedWarningStories'][$file_index];
+                                        unset($success_array['postedWarningStories'][$file_index]);
+                                        $success_array['failedStories'][$file_index]['fails'][] = "Duplicate headline";
                                     }
                                 }
                             } else {
-                                $success_array['failedStories'][$headline][] = "Not .docx file";
-                                if (isset($success_array['postedWarningStories'][$headline])) {
-                                    unset($success_array['postedWarningStories'][$headline]);
-                                }
+                                unset($success_array['postedWarningStories'][$file_index]);
+                                $success_array['failedStories'][$file_index]['fails'][] = "Not .docx file";
                             }
                         }
+                        $file_index++;
                     }
                 } else {
                     $success_array['fatalError'] = "Could not extract file";
@@ -444,6 +448,17 @@ function bt_author_template_loader($template)
         $new_template = untrailingslashit(plugin_dir_path(__FILE__)) . '/templates/author.php';
         return $new_template;
     }
+
+    if (strpos($template, 'single.php')) {
+        wp_register_script( 'bt-insert-byline', plugin_dir_url(__FILE__) . 'bt-insert-byline.js' );
+        $author_id=get_post_field( 'post_author', get_the_ID() );
+        $author_array = array('role' => get_the_author_meta('staff_role', $author_id));
+        wp_localize_script('bt-insert-byline', 'author', $author_array);
+        wp_enqueue_script('bt-insert-byline');
+
+        wp_enqueue_style('bt-byline-style', plugin_dir_url(__FILE__) . 'bt-byline-style.css');
+    }
+
     return $template;
 }
 

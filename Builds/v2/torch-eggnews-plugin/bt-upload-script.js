@@ -4,38 +4,40 @@ jQuery(document).ready(function($) {
     console.log(data);
   }
 
+  function display_fatal(error_text) {
+    $('#success_message').hide();
+    $('#error_message').append('<span id="specific_err"></span>');
+    $('#specific_err').text(error_text);
+    $('#error_message').show();
+  }
+
   function after_form_submitted(data) {
     if (data.fatalError != '') {
-      $('#success_message').hide();
-      $('#error_message').append('<span id="specific_err"></span>');
-      $('#specific_err').text(data.fatalError);
-      $('#error_message').show();
+      display_fatal(data.fatalError);
     } else {
       //Successfully posted stories
       $('#posted_message').after('<ul id="success_list"></ul>');
-      jQuery.each(data.postedStories, function(headline, linkArray) {
-        $('#success_list').append('<li class="bt-story bt-story-success"><h4><a href="' + linkArray.link + '" target="_blank" rel="noopener noreferrer">' + headline + '</a></h4></li>');
+      jQuery.each(data.postedStories, function(i, infoArray) {
+        $('#success_list').append('<li class="bt-story bt-story-success"><h4>Headline: <a href="' + infoArray.link + '" target="_blank" rel="noopener noreferrer">' + infoArray.headline + '</a><br>Filename: ' + infoArray.filename + '</h4></li>');
       });
       //Stories posted with warnings
       $('#posted_warn_message').after('<ul id="warning_list"></ul>');
-      jQuery.each(data.postedWarningStories, function(headline, warningArray) {
-        console.log(headline);
-        var warnText = '<li class="bt-story bt-story-warning"><h4><a href="' + warningArray.link + '" target="_blank" rel="noopener noreferrer">' + headline + '</a></h4><ul>';
+      jQuery.each(data.postedWarningStories, function(i, infoArray) {
+        console.log(infoArray.headline);
+        var warnText = '<li class="bt-story bt-story-warning">Headline: <h4><a href="' + infoArray.link + '" target="_blank" rel="noopener noreferrer">' + infoArray.headline + '</a><br>Filename: ' + infoArray.filename + '</h4><ul>';
 
-        jQuery.each(warningArray, function(key, warning) {
-          if (key != 'link') {
-            warnText += '<li>' + warning + '</li>';
-          }
+        jQuery.each(infoArray.warnings, function(j, warning) {
+          warnText += '<li>' + warning + '</li>';
         });
         warnText += '</ul></li>';
         $('#warning_list').append(warnText);
       });
       //Stories not posted due to fatal errors
       $('#posted_fatal_message').after('<ul id="fail_list"></ul>');
-      jQuery.each(data.failedStories, function(headline, failArray) {
-        var failText = '<li class="bt-story bt-story-failed"><h4>' + headline + '</h4><ul>';
+      jQuery.each(data.failedStories, function(i, infoArray) {
+        var failText = '<li class="bt-story bt-story-failed"><h4>' + infoArray.filename + '</h4><ul>';
 
-        jQuery.each(failArray, function(key, fail) {
+        jQuery.each(infoArray.fails, function(j, fail) {
           failText += '<li>' + fail + '</li>';
         });
         failText += '</ul></li>';
@@ -78,7 +80,7 @@ jQuery(document).ready(function($) {
       after_form_submitted(response);
       console.log(response);
     }).fail(function(response) {
-      api_error(response);
+      display_fatal(response);
     }).always(function() {
       // e.g. Remove 'loading' class.
       $("#submitButton").prop('type', 'submit');

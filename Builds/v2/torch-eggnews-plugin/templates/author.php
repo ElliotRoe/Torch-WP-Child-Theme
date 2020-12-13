@@ -26,7 +26,7 @@ get_header(); ?>
 						</span>
 					</div>
 				</header><!-- .page-header -->
-				<?php if (!strpos($curauth->display_name,'Bexley')) {
+				<?php if (strpos($curauth->display_name,'exley')) {
 					echo "<style>.bt-author-bio{display: none;}</style>";
 				} ?>
 				<div class="bt-author-bio">

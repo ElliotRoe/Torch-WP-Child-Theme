@@ -1,0 +1,10 @@
+.staff-role:before {
+  content: "\f040";
+  font-family: FontAwesome;
+  font-style: normal;
+  margin-right: 5px;
+}
+
+.comments-link {
+  display: none;
+}
